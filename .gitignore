@@ -1,1 +1,7 @@
 venv/
+
+iadf_engine.log
+iadf_state.json
+iadf_state.json.tmp
+*.corrupt.json
+.aider*
