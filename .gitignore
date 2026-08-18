@@ -5,3 +5,8 @@ iadf_state.json
 iadf_state.json.tmp
 *.corrupt.json
 .aider*
+# --- IADF engine artifacts ---
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
