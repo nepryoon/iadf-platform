@@ -1,0 +1,44 @@
+# ============================================================================
+# IADF LOCAL-SYNTH runtime (ADD §15.1, §17.2)
+# Sviluppo deterministico e bootstrap: PostgreSQL canonico + object store
+# S3-compatibile (MinIO). Mai fidato per produzione; firmatario finto.
+# Generato da iadf_cost_optimized_engine.py — modifiche manuali consentite.
+# ============================================================================
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: iadf-synth-postgres
+    environment:
+      POSTGRES_USER: iadf
+      POSTGRES_PASSWORD: iadf-synth-secret
+      POSTGRES_DB: iadf
+    ports:
+      - "${IADF_PG_PORT:-5433}:5432"
+    volumes:
+      - iadf-pgdata:/var/lib/postgresql/data
+      - ./db:/ddl:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iadf -d iadf"]
+      interval: 2s
+      timeout: 3s
+      retries: 45
+  minio:
+    image: minio/minio:latest
+    container_name: iadf-synth-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: iadf-minio
+      MINIO_ROOT_PASSWORD: iadf-synth-minio-secret
+    ports:
+      - "${IADF_MINIO_PORT:-9000}:9000"
+      - "${IADF_MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - iadf-miniodata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9000/minio/health/live || exit 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+volumes:
+  iadf-pgdata:
+  iadf-miniodata:

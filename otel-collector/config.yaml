@@ -1,0 +1,29 @@
+# OTel Collector minimale per il profilo LOCAL-SYNTH (ADD §15.1).
+# Non autoritativo: la perdita di telemetria non può creare PASS
+# (OPS-IADF-002).
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  batch: {}
+exporters:
+  debug:
+    verbosity: basic
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
