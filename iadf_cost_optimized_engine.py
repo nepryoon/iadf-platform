@@ -1776,12 +1776,7 @@ class TaskRunner:
 
         for attempt in range(1 + MAX_REPAIR_ATTEMPTS):  # 0 = run iniziale
             if attempt > 0:
-                LOG.warning(
-                    "[%s] Rollback workspace (git reset --hard + clean -fd) "
-                    "e ripristino del Red Test su disco.", task.id,
-                )
-                self.git.rollback()
-                self._write_test(plan)  # Red Test Preservation
+                self._write_test(plan)  # Red Test Preservation (preserva il codice per il repair)
 
             # Frontier Diagnostician (ADD §24.3 step 4): una sola diagnosi per
             # task, dopo il fallimento del 1° repair, prima dell'ultimo run.
