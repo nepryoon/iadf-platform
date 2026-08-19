@@ -1746,6 +1746,7 @@ class TaskRunner:
 
     # --------------------------------------------------------------- pipeline
     def run_task(self, task: TaskSpec) -> None:
+        self.cfg.aider_model = "deepseek/deepseek-chat"
         LOG.info("=" * 78)
         LOG.info("TASK %s — %s", task.id, task.title)
         LOG.info("=" * 78)
@@ -1787,6 +1788,7 @@ class TaskRunner:
                 and diagnosis is None
             ):
                 diagnosis = self._frontier_diagnosis(task, plan, capsules)
+                self.cfg.aider_model = "anthropic/claude-3-5-sonnet-20241022"
 
             label = "iniziale" if attempt == 0 else f"repair {attempt}/{MAX_REPAIR_ATTEMPTS}"
             self.state.update_current(phase="IMPLEMENTING", attempt=attempt)
