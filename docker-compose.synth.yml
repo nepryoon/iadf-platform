@@ -15,7 +15,7 @@ services:
     ports:
       - "${IADF_PG_PORT:-5433}:5432"
     volumes:
-      - iadf-pgdata:/var/lib/postgresql/data
+      - iadf-pgdata:/var/lib/postgresql
       - ./db:/ddl:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U iadf -d iadf"]
