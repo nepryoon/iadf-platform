@@ -1493,6 +1493,12 @@ class AnthropicGateway:
                         status, transient, MAX_TRANSIENT_RETRIES, backoff,
                     )
                     time.sleep(backoff)
+                elif status == 400 and "credit balance" in str(exc).lower():
+                    raise EngineError(
+                        "Credito API Anthropic esaurito: ricaricare su "
+                        "console.anthropic.com/settings/billing, poi rilanciare "
+                        "l'engine (lo stato riprende dal task incompleto)."
+                    ) from exc
                 else:
                     raise
 
