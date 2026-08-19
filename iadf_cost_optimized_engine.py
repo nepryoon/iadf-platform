@@ -85,7 +85,7 @@ DEFAULT_AIDER_MODEL = os.environ.get("IADF_AIDER_MODEL", "deepseek/deepseek-chat
 
 SUBPROCESS_TIMEOUT = int(os.environ.get("IADF_SUBPROCESS_TIMEOUT", "600"))
 
-MAX_REPAIR_ATTEMPTS = 2        # §24.3: 1 run iniziale + max 2 main repair.
+MAX_REPAIR_ATTEMPTS = 4        # §24.3: 1 run iniziale + max 2 main repair.
 MAX_PLAN_ATTEMPTS = 3          # Rigenerazioni del piano su Red-Proof violato.
 MAX_RATE_LIMIT_PAUSES = 12     # Pause 429 consecutive prima di arrendersi.
 MAX_TRANSIENT_RETRIES = 5      # Retry su errori di rete / HTTP 5xx / 529.
@@ -1789,6 +1789,18 @@ class TaskRunner:
             ):
                 diagnosis = self._frontier_diagnosis(task, plan, capsules)
                 self.cfg.aider_model = "anthropic/claude-3-5-sonnet-20241022"
+
+            # --- PROGRESSIVE MODEL ROUTING ---
+            if attempt <= 1:
+                self.cfg.aider_model = "deepseek/deepseek-chat"
+            elif attempt <= 3:
+                if attempt == 2:
+                    LOG.warning("[%s] 🚀 ESCALATION TIER 2: Passaggio a Claude 3.5 Sonnet", task.id)
+                self.cfg.aider_model = "anthropic/claude-3-5-sonnet-20241022"
+            else:
+                if attempt == 4:
+                    LOG.warning("[%s] 🚀 ESCALATION TIER 3: Passaggio a Claude 3 Opus (Frontier)", task.id)
+                self.cfg.aider_model = "anthropic/claude-3-opus-20240229"
 
             label = "iniziale" if attempt == 0 else f"repair {attempt}/{MAX_REPAIR_ATTEMPTS}"
             self.state.update_current(phase="IMPLEMENTING", attempt=attempt)
