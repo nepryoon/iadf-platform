@@ -1,12 +1,11 @@
-venv/
-
-iadf_engine.log
-iadf_state.json
-iadf_state.json.tmp
-*.corrupt.json
-.aider*
-# --- IADF engine artifacts ---
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+iadf_state.json
+iadf_engine.log
+*.log
 .pytest_cache/
 .ruff_cache/
