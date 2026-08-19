@@ -35,7 +35,7 @@
     },
     "status": {
       "type": "string",
-      "enum": ["DRAFT", "ACTIVE", "SUSPENDED", "REVOKED", "EXPIRED"]
+      "enum": ["DRAFT", "ACTIVE", "EXPIRED", "SUPERSEDED"]
     },
     "allowed_change_classes": {
       "type": "array",
@@ -43,14 +43,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": [
-          "refactor",
-          "feature",
-          "bugfix",
-          "chore",
-          "migration",
-          "config"
-        ]
+        "minLength": 1
       }
     },
     "excluded_paths": {
@@ -90,7 +83,7 @@
     },
     "data_residency": {
       "type": "string",
-      "enum": ["eu-only", "eu-preferred"]
+      "const": "eu-only"
     },
     "retention_days": {
       "type": "integer",
