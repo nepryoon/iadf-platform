@@ -1788,7 +1788,7 @@ class TaskRunner:
                 and diagnosis is None
             ):
                 diagnosis = self._frontier_diagnosis(task, plan, capsules)
-                self.cfg.aider_model = "anthropic/claude-3-5-sonnet-20241022"
+                self.cfg.aider_model = "anthropic/claude-sonnet-4-5"
 
             # --- PROGRESSIVE MODEL ROUTING ---
             if attempt <= 1:
@@ -1796,11 +1796,11 @@ class TaskRunner:
             elif attempt <= 3:
                 if attempt == 2:
                     LOG.warning("[%s] 🚀 ESCALATION TIER 2: Passaggio a Claude 3.5 Sonnet", task.id)
-                self.cfg.aider_model = "anthropic/claude-3-5-sonnet-20241022"
+                self.cfg.aider_model = "anthropic/claude-sonnet-4-5"
             else:
                 if attempt == 4:
                     LOG.warning("[%s] 🚀 ESCALATION TIER 3: Passaggio a Claude 3 Opus (Frontier)", task.id)
-                self.cfg.aider_model = "anthropic/claude-3-opus-20240229"
+                self.cfg.aider_model = "anthropic/claude-opus-4-5"
 
             label = "iniziale" if attempt == 0 else f"repair {attempt}/{MAX_REPAIR_ATTEMPTS}"
             self.state.update_current(phase="IMPLEMENTING", attempt=attempt)
