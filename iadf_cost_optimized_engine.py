@@ -1746,7 +1746,7 @@ class TaskRunner:
 
     # --------------------------------------------------------------- pipeline
     def run_task(self, task: TaskSpec) -> None:
-        self.cfg.aider_model = "deepseek/deepseek-chat"
+        self.cfg.aider_model = "anthropic/claude-sonnet-4-5"
         LOG.info("=" * 78)
         LOG.info("TASK %s — %s", task.id, task.title)
         LOG.info("=" * 78)
