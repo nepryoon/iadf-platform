@@ -9,3 +9,6 @@ iadf_engine.log
 *.log
 .pytest_cache/
 .ruff_cache/
+
+# Aider
+.aider*
