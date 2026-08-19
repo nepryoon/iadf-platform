@@ -1,7 +1,10 @@
-"""Contratti JSON Schema IADF (TASK-01-SCHEMAS).
+"""JSON Schema contracts for IADF (TASK-01-SCHEMAS).
 
-Espone il caricamento cache-ato degli schemi normativi e la validazione
-dei documenti con raccolta completa degli errori.
+Implements the normative contracts from ADD §4 (glossary), §19.2 (entity
+catalogue), §20.2 (result algebra) and §25.5 (signature coverage).
+
+Exposes cached schema loading and document validation with complete
+error collection.
 """
 from __future__ import annotations
 
@@ -10,7 +13,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-import jsonschema
+from jsonschema import Draft202012Validator, FormatChecker
 
 __all__ = [
     "RESULT_ALGEBRA",
@@ -20,10 +23,9 @@ __all__ = [
     "validate_document",
 ]
 
-SCHEMA_DIR = Path(__file__).parent
+SCHEMA_DIR: Path = Path(__file__).resolve().parent
 
-# ADD 20.2 - algebra dei risultati, ordine normativo vincolante.
-RESULT_ALGEBRA = (
+RESULT_ALGEBRA: tuple[str, ...] = (
     "PASS",
     "FAIL",
     "NOT_RUN",
@@ -37,15 +39,17 @@ RESULT_ALGEBRA = (
     "SUPERSEDED",
 )
 
-_SCHEMA_FILES = {
+_SCHEMA_FILES: dict[str, str] = {
     "evidence_receipt": "evidence_receipt.schema.json",
     "aoe": "aoe.schema.json",
     "acm": "acm.schema.json",
 }
 
+_FORMAT_CHECKER = FormatChecker()
+
 
 class SchemaValidationError(Exception):
-    """Errore di validazione che aggrega tutte le violazioni riscontrate."""
+    """Validation error that aggregates all violations found."""
 
     def __init__(self, errors: list[str]) -> None:
         self.errors = list(errors)
@@ -54,28 +58,39 @@ class SchemaValidationError(Exception):
 
 @cache
 def load_schema(name: str) -> dict[str, Any]:
-    """Carica e memorizza in cache lo schema `name`.
+    """Load and cache the schema identified by `name`.
 
-    Solleva KeyError se il nome non corrisponde a uno schema noto.
+    Args:
+        name: One of "evidence_receipt", "aoe", or "acm".
+
+    Returns:
+        The parsed JSON schema as a dictionary.
+
+    Raises:
+        KeyError: If `name` is not a known schema name.
     """
     filename = _SCHEMA_FILES[name]
     path = SCHEMA_DIR / filename
-    with open(path, "r", encoding="utf-8") as handle:
-        return json.load(handle)
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def validate_document(name: str, document: Any) -> None:
-    """Valida `document` contro lo schema `name`.
+def validate_document(name: str, document: dict[str, Any]) -> None:
+    """Validate `document` against the schema identified by `name`.
 
-    Raccoglie tutte le violazioni prima di sollevare, in modo che il
-    chiamante veda l'insieme completo dei difetti in un solo passaggio.
+    Collects all violations before raising, so the caller sees the
+    complete set of defects in a single pass.
+
+    Args:
+        name: One of "evidence_receipt", "aoe", or "acm".
+        document: The document to validate.
+
+    Raises:
+        KeyError: If `name` is not a known schema name.
+        SchemaValidationError: If validation fails, containing all errors.
     """
-    validator = jsonschema.Draft202012Validator(
-        load_schema(name),
-        format_checker=jsonschema.FormatChecker(),
-    )
+    schema = load_schema(name)
+    validator = Draft202012Validator(schema, format_checker=_FORMAT_CHECKER)
     errors = sorted(validator.iter_errors(document), key=lambda e: list(e.path))
     if errors:
-        raise SchemaValidationError(
-            [f"{e.json_path}: {e.message}" for e in errors]
-        )
+        messages = [f"{e.json_path}: {e.message}" for e in errors]
+        raise SchemaValidationError(messages)

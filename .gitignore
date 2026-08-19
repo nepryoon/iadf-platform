@@ -12,3 +12,7 @@ iadf_engine.log
 
 # Aider
 .aider*
+# --- IADF engine artifacts ---
+iadf_state.json.tmp
+*.corrupt.json
+*.pyc

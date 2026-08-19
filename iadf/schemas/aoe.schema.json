@@ -1,0 +1,113 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "iadf://schema/autonomous-operating-envelope/v1",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "envelope_id",
+        "project_id",
+        "version",
+        "status",
+        "allowed_change_classes",
+        "excluded_paths",
+        "risk_ceiling",
+        "budgets",
+        "data_residency",
+        "retention_days",
+        "effective_from",
+        "effective_to",
+        "signature"
+    ],
+    "properties": {
+        "envelope_id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "project_id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "version": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "status": {
+            "enum": ["DRAFT", "ACTIVE", "EXPIRED", "SUPERSEDED"]
+        },
+        "allowed_change_classes": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "excluded_paths": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "risk_ceiling": {
+            "enum": ["R0", "R1", "R2", "R3"]
+        },
+        "budgets": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "max_cost_eur",
+                "max_tokens_per_call",
+                "max_wall_seconds"
+            ],
+            "properties": {
+                "max_cost_eur": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                },
+                "max_tokens_per_call": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                },
+                "max_wall_seconds": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0
+                }
+            }
+        },
+        "data_residency": {
+            "const": "eu-only"
+        },
+        "retention_days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2555
+        },
+        "effective_from": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "effective_to": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "signature": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["alg", "key_id", "value"],
+            "properties": {
+                "alg": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "key_id": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "value": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,90 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "iadf://schema/evidence-receipt/v1",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "receipt_id",
+        "schema_id",
+        "subject_digest",
+        "gate_id",
+        "issuer_id",
+        "result",
+        "issued_at",
+        "expires_at",
+        "policy_digest",
+        "binding_digest",
+        "signature"
+    ],
+    "properties": {
+        "receipt_id": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "schema_id": {
+            "const": "iadf://schema/evidence-receipt/v1"
+        },
+        "subject_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+        },
+        "gate_id": {
+            "type": "string",
+            "minLength": 1
+        },
+        "issuer_id": {
+            "type": "string",
+            "minLength": 1
+        },
+        "result": {
+            "enum": [
+                "PASS",
+                "FAIL",
+                "NOT_RUN",
+                "SKIPPED",
+                "UNKNOWN",
+                "ERROR",
+                "INCONCLUSIVE",
+                "TIMEOUT",
+                "STALE",
+                "EXPIRED",
+                "SUPERSEDED"
+            ]
+        },
+        "issued_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "expires_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+        },
+        "policy_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+        },
+        "binding_digest": {
+            "type": ["string", "null"],
+            "pattern": "^[a-f0-9]{64}$"
+        },
+        "signature": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["alg", "key_id", "value"],
+            "properties": {
+                "alg": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "key_id": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "value": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        }
+    }
+}
