@@ -2176,6 +2176,9 @@ class TaskRunner:
     ) -> str:
         parts: List[str] = [
             f"[IADF {task.id}] {task.title}",
+            "=== NORMATIVE SPECIFICATION (authoritative: enum values, formats "
+            "and constraints below are literal and MUST NOT be re-derived from "
+            "the tests) ===\n" + task.objective.strip(),
             plan.coder_prompt.strip(),
             textwrap.dedent(f"""\
                 === NON-NEGOTIABLE CONSTRAINTS ===
