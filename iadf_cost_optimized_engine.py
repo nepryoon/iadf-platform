@@ -1836,6 +1836,25 @@ class TaskRunner:
             green = self._run_pytest(self._green_paths(plan))
             ruff = self._run_ruff()
 
+            # Gate di esistenza deliverable: la suite verde non basta,
+            # gli artefatti del task devono esistere su disco.
+            missing = [
+                f for f in plan.target_files
+                if not (self.cfg.repo_root / f).is_file()
+            ]
+            if missing:
+                LOG.error(
+                    "[%s] Verify-Green FALLITO: deliverable mancanti: %s",
+                    task.id, ", ".join(missing),
+                )
+                capsules.append(self._capsule(
+                    task, attempt, "VERIFY_GREEN",
+                    pytest_exit=1,
+                    pytest_tail="Deliverable mancanti sul filesystem: " + ", ".join(missing),
+                    ruff_tail=head_tail(ruff.stdout + "\n" + ruff.stderr, 2000),
+                ))
+                continue
+
             if green.returncode != 0:
                 LOG.error("[%s] Verify-Green FALLITO (pytest exit=%s).", task.id, green.returncode)
                 capsules.append(self._capsule(
